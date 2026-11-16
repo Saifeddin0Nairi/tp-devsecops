@@ -49,6 +49,20 @@ jobs:
       - name: Build Java project with Maven
         run: mvn clean package
 
+      # SonarCloud analysis (SAST): bugs, vulnerabilities, code smells + Quality Gate
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8.5.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=src/main,pom.xml,Dockerfile
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.qualitygate.wait=true
+
       # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
